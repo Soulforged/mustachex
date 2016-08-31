@@ -1,6 +1,9 @@
 defmodule Mustachex.Tokenizer do
   @moduledoc false
 
+  @default_open_delimiter Application.get_env(:mustachex, :open_delimiter, '{{')
+  @default_close_delimiter Application.get_env(:mustachex, :close_delimiter, '}}')
+
   def tokenize(template) when is_binary(template) do
     tokenize(String.to_char_list(template))
   end
@@ -11,8 +14,8 @@ defmodule Mustachex.Tokenizer do
 
   defp scan('{{{' ++ t, scanned, buf, :in_text), do: scan(t, scanned ++ [parse_text(buf)], [], :in_unescaped_var)
   defp scan('}}}' ++ t, scanned, buf, :in_unescaped_var), do: scan(t, scanned ++ [parse_variable(buf, :unescaped)], [], :in_text)
-  defp scan('{{' ++ t, scanned, buf, :in_text), do: scan(t, scanned ++ [parse_text(buf)], [], :in_tag)
-  defp scan('}}' ++ t, scanned, buf, :in_tag), do: scan(t, scanned ++ [parse_tag(strip(buf))], [], :in_text)
+  defp scan(@default_open_delimiter ++ t, scanned, buf, :in_text), do: scan(t, scanned ++ [parse_text(buf)], [], :in_tag)
+  defp scan(@default_close_delimiter ++ t, scanned, buf, :in_tag), do: scan(t, scanned ++ [parse_tag(strip(buf))], [], :in_text)
   defp scan([h|t], scanned, buf, scan_type), do: scan(t, scanned, buf ++ [h], scan_type)
   defp scan([], scanned, buf, :in_text), do: scanned ++ [parse_text(buf)]
 
@@ -70,4 +73,3 @@ defmodule Mustachex.Tokenizer do
   end
 
 end
-

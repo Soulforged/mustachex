@@ -3,8 +3,8 @@ defmodule Mustachex.Mixfile do
 
   def project do
     [app: :mustachex,
-     version: "0.0.1",
-     elixir: "~> 1.0.0",
+     version: "0.0.2",
+     elixir: "~> 1.3.2",
      deps: deps,
      description: description,
      package: package]
